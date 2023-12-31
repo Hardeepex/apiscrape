@@ -62,9 +62,23 @@ json_data = {
     'bTypeId': 0,
 }
 
+import json
+from pprint import pprint
+
 def fetch_api_data(api_url, request_data):
     response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
-    return response
+    # Parse the response JSON
+    response_json = response.json()
+    # Organize the data in a specific format
+    organized_data = organize_data(response_json)
+    return organized_data
+
+def organize_data(data):
+    # Implement this function to organize the data in a specific format
+    organized = {} # Placeholder for organized data structure
+    # TODO: Add code to organize the data as required
+    pprint(organized) # Use pprint to output the organized data
+    return organized
 
 response = fetch_api_data('https://www.livabl.com/api/map/GetPins', json_data)
 
@@ -83,7 +97,7 @@ if response.status_code == 200:
     print("Request successful!")
     # Write response content to output.json
     import json
-    with open('output.json', 'w') as file:
+    with open('output.json', 'w') as file:  # 'w' mode will overwrite the file if it exists
         json.dump(response.json(), file)
 else:
     print("Request failed with status code:", response.status_code)
