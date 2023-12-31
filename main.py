@@ -1,4 +1,5 @@
 import requests
+from .scrape import fetch_html, parse_html, select_elements, xpath_elements
 
 cookies = {
     'LocationIP': '99.235.82.251',
@@ -65,8 +66,28 @@ json_data = {
 import json
 from pprint import pprint
 
-def fetch_api_data(api_url, request_data):
-    response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
+# Example usage of the scrape.py functions
+url = 'http://example.com'  # Replace with the actual URL
+html_content = fetch_html(url)
+soup = parse_html(html_content)
+# Replace '.css-selector' with the actual CSS selector
+# Replace '/xpath/expression' with the actual XPath expression
+elements_by_css = select_elements(soup, '.css-selector')
+elements_by_xpath = xpath_elements(soup, '/xpath/expression')
+
+# Print the elements to the console
+pprint(elements_by_css)
+pprint(elements_by_xpath)
+
+# Alternatively, write the elements to a file
+with open('extracted_data.txt', 'w') as file:
+    for element in elements_by_css:
+        file.write(str(element))
+    for element in elements_by_xpath:
+        file.write(str(element))
+
+# def fetch_api_data(api_url, request_data):
+#     response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
     # Parse the response JSON
     response_json = response.json()
     # Organize the data in a specific format
@@ -88,16 +109,16 @@ response = fetch_api_data('https://www.livabl.com/api/map/GetPins', json_data)
 #response = requests.post('https://www.livabl.com/api/map/GetPins', cookies=cookies, headers=headers, data=data)
 
 # Make the GET request
-response = requests.get(url, headers=headers)
+# response = requests.get(url, headers=headers)
 
 # Check if the request was successful
-if response.status_code != 200:
-    raise Exception(f'Request failed with status code: {response.status_code}')
-if response.status_code == 200:
-    print("Request successful!")
+# if response.status_code != 200:
+#     raise Exception(f'Request failed with status code: {response.status_code}')
+# if response.status_code == 200:
+#     print("Request successful!")
     # Write response content to output.json
     import json
     with open('output.json', 'w') as file:  # 'w' mode will overwrite the file if it exists
         json.dump(response.json(), file)
-else:
-    print("Request failed with status code:", response.status_code)
+# else:
+#     print("Request failed with status code:", response.status_code)
