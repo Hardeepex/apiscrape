@@ -1,4 +1,5 @@
 import requests
+import scraper
 
 cookies = {
     'LocationIP': '99.235.82.251',
@@ -69,6 +70,12 @@ def fetch_api_data(api_url, request_data):
     response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
     # Parse the response JSON
     response_json = response.json()
+    # Scrape additional data from web pages
+    html_content = scraper.get_html('WEB_PAGE_URL')
+    parsed_html = scraper.parse_html(html_content)
+    scraped_data = scraper.extract_data(parsed_html, 'CSS_SELECTOR_OR_XPATH')
+    # Include scraped data in the organized data
+    organized_data['scraped_data'] = scraped_data
     # Organize the data in a specific format
     organized_data = organize_data(response_json)
     return organized_data
