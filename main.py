@@ -62,7 +62,11 @@ json_data = {
     'bTypeId': 0,
 }
 
-response = requests.post('https://www.livabl.com/api/map/GetPins', cookies=cookies, headers=headers, json=json_data)
+def fetch_api_data(api_url, request_data):
+    response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
+    return response
+
+response = fetch_api_data('https://www.livabl.com/api/map/GetPins', json_data)
 
 # Note: json_data will not be serialized by requests
 # exactly as it was in the original request.
@@ -73,9 +77,13 @@ response = requests.post('https://www.livabl.com/api/map/GetPins', cookies=cooki
 response = requests.get(url, headers=headers)
 
 # Check if the request was successful
+if response.status_code != 200:
+    raise Exception(f'Request failed with status code: {response.status_code}')
 if response.status_code == 200:
     print("Request successful!")
-    # Print response content
-    print(response.content)
+    # Write response content to output.json
+    import json
+    with open('output.json', 'w') as file:
+        json.dump(response.json(), file)
 else:
     print("Request failed with status code:", response.status_code)
