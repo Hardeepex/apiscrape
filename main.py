@@ -36,6 +36,8 @@ headers = {
     'sec-ch-ua-platform': '"Android"',
 }
 
+from .scrape import fetch_page, parse_page, extract_content
+
 json_data = {
     'sellStatus': 'fs',
     'homeType': [],
@@ -65,10 +67,21 @@ json_data = {
 import json
 from pprint import pprint
 
-def fetch_api_data(api_url, request_data):
+def fetch_api_data(api_url, request_data, scrape_url=None, selector=None, use_xpath=False):
+    if scrape_url and selector:
+        html_content = fetch_page(scrape_url)
+        soup = parse_page(html_content)
+        scraped_data = extract_content(soup, selector, xpath=use_xpath)
+        # Depending on where to integrate scraped data, add it to request_data or organized_data
     response = requests.post(api_url, cookies=cookies, headers=headers, json=request_data)
     # Parse the response JSON
     response_json = response.json()
+    if 'scraped_data' in locals():
+        # The following is a placeholder for integrating the scraped data.
+        # This might need to be adjusted depending on the actual structure of response_json and expected data.
+        if 'some_key' not in response_json:
+            response_json['some_key'] = []
+        response_json['some_key'].extend(scraped_data)
     # Organize the data in a specific format
     organized_data = organize_data(response_json)
     return organized_data
