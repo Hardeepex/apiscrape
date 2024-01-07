@@ -1,4 +1,5 @@
 import requests
+import csv
 
 cookies = {
     'LocationIP': '99.235.82.251',
@@ -84,6 +85,19 @@ def fetch_api_data(api_url, request_data, scrape_url=None, selector=None, use_xp
         response_json['some_key'].extend(scraped_data)
     # Organize the data in a specific format
     organized_data = organize_data(response_json)
+    # Save the organized data in JSON format
+    try:
+        with open('data.json', 'w') as json_file:
+            json.dump(organized_data, json_file)
+    except Exception as e:
+        print('An error occurred while writing to JSON:', e)
+    # Save the organized data in CSV format
+    try:
+        with open('data.csv', 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerows(organized_data.items())
+    except Exception as e:
+        print('An error occurred while writing to CSV:', e)
     return organized_data
 
 def organize_data(data):
@@ -114,3 +128,27 @@ if response.status_code == 200:
         json.dump(response.json(), file)
 else:
     print("Request failed with status code:", response.status_code)
+
+def upload_data_to_server(file_path, server_url):
+    try:
+        with open(file_path, 'rb') as data_file:
+            files = {'file': (file_path, data_file)}
+            response = requests.post(server_url, files=files)
+            response.raise_for_status()
+            print('File uploaded successfully.')
+    except Exception as e:
+        print('An error occurred during file upload:', e)
+
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+@app.route('/api/data', methods=['GET'])
+def create_api(file_path):
+    try:
+        with open(file_path, 'r') as data_file:
+            data = json.load(data_file)
+            return jsonify(data)
+    except Exception as e:
+        print('An error occurred while creating the API:', e)
+        return jsonify({'error': 'An error occurred while loading data'}), 500
